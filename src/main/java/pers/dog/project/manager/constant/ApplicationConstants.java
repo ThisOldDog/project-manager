@@ -9,5 +9,5 @@ public class ApplicationConstants {
     private ApplicationConstants() {
     }
 
-    public static final String PropertyRoot = "project-manager";
+    public static final String PROJECT_MANAGER = "project-manager";
 }

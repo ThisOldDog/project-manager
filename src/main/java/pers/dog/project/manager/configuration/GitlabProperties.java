@@ -8,7 +8,7 @@ import pers.dog.project.manager.constant.ApplicationConstants;
  *
  * @author 废柴 2020/12/24 16:53
  */
-@ConfigurationProperties(ApplicationConstants.PropertyRoot + ".gitlab")
+@ConfigurationProperties(ApplicationConstants.PROJECT_MANAGER + ".gitlab")
 public class GitlabProperties {
     private String home;
 
