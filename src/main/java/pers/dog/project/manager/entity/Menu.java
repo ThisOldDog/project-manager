@@ -22,6 +22,9 @@ public class Menu {
     @Column(length = 32, nullable = false)
     private String menuName;
 
+    @Column(length = 32)
+    private String menuIcon;
+
     @Column(nullable = false)
     private Integer sortNumber;
 
@@ -59,6 +62,15 @@ public class Menu {
 
     public Menu setMenuName(String menuName) {
         this.menuName = menuName;
+        return this;
+    }
+
+    public String getMenuIcon() {
+        return menuIcon;
+    }
+
+    public Menu setMenuIcon(String menuIcon) {
+        this.menuIcon = menuIcon;
         return this;
     }
 
