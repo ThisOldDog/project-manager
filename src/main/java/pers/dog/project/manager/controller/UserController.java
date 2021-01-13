@@ -1,10 +1,10 @@
 package pers.dog.project.manager.controller;
 
-import org.gitlab4j.api.models.User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import pers.dog.project.manager.component.context.SecurityContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import pers.dog.project.manager.entity.User;
 import pers.dog.project.manager.service.UserService;
 
 /**
@@ -16,17 +16,32 @@ import pers.dog.project.manager.service.UserService;
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
-    private final SecurityContext securityContext;
 
-    public UserController(UserService userService, SecurityContext securityContext) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.securityContext = securityContext;
     }
 
     @GetMapping
-    public User queryUser() {
-        User user = securityContext.currentUser();
-        userService.storeUser(user.getId(), user.getName());
-        return user;
+    public Page<User> pageUser(User user,
+                               Pageable pageable) {
+        return userService.pageUser(user, pageable);
+    }
+
+    @PutMapping("/cancel-admin/{userId}")
+    public ResponseEntity<Void> cancelAdmin(@PathVariable int userId) {
+        userService.adminUser(userId, false);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/assign-admin/{userId}")
+    public ResponseEntity<Void> assignAdmin(@PathVariable int userId) {
+        userService.adminUser(userId, true);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable int userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 }

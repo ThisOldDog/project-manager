@@ -12,10 +12,16 @@ import javax.persistence.*;
 public class User {
     @Id
     private Integer userId;
-    @Column(length = 128, nullable = false, unique = true)
+    @Column(length = 128, nullable = false)
     private String username;
     @Column(name = "is_admin", nullable = false)
     private Boolean admin;
+    @Column(length = 128, nullable = false)
+    private String nickname;
+    @Column(length = 256)
+    private String email;
+    @Column(length = 1024)
+    private String avatarUrl;
 
     public Integer getUserId() {
         return userId;
@@ -41,6 +47,33 @@ public class User {
 
     public User setAdmin(Boolean admin) {
         this.admin = admin;
+        return this;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public User setNickname(String nickname) {
+        this.nickname = nickname;
+        return this;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public User setEmail(String email) {
+        this.email = email;
+        return this;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public User setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
         return this;
     }
 }
