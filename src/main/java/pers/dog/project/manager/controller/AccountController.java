@@ -5,7 +5,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pers.dog.project.manager.component.context.SecurityContext;
+import pers.dog.project.manager.controller.vo.MenuResponse;
+import pers.dog.project.manager.service.MenuService;
 import pers.dog.project.manager.service.UserService;
+
+import java.util.List;
 
 /**
  * 用户信息
@@ -16,10 +20,14 @@ import pers.dog.project.manager.service.UserService;
 @RequestMapping("/user")
 public class AccountController {
     private final UserService userService;
+    private final MenuService menuService;
     private final SecurityContext securityContext;
 
-    public AccountController(UserService userService, SecurityContext securityContext) {
+    public AccountController(UserService userService,
+                             MenuService menuService,
+                             SecurityContext securityContext) {
         this.userService = userService;
+        this.menuService = menuService;
         this.securityContext = securityContext;
     }
 
@@ -28,5 +36,10 @@ public class AccountController {
         User user = securityContext.currentUser();
         userService.storeUser(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getAvatarUrl());
         return user;
+    }
+
+    @GetMapping("/menu/tree")
+    public List<MenuResponse> treeMenu() {
+        return menuService.treeMenu(securityContext.currentUser().getId());
     }
 }

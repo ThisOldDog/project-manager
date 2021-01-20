@@ -12,6 +12,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "PM_MENU")
 public class Menu {
+    public static final String FIELD_SORT_NUMBER = "sortNumber";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer menuId;
