@@ -33,4 +33,12 @@ public class ExceptionHandleProcessor {
                 .body(new ExceptionResponseBody()
                         .setMessage(HttpStatus.UNAUTHORIZED.getReasonPhrase()));
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ExceptionResponseBody> handleException(IllegalArgumentException e) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ExceptionResponseBody()
+                        .setMessage(e.getMessage()));
+    }
 }

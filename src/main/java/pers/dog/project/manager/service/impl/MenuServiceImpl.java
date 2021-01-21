@@ -5,11 +5,13 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import pers.dog.project.manager.constant.MenuType;
 import pers.dog.project.manager.controller.vo.MenuResponse;
 import pers.dog.project.manager.entity.Menu;
 import pers.dog.project.manager.repository.MenuRepository;
 import pers.dog.project.manager.service.MenuService;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,7 +48,12 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public Menu createMenu(Menu menu) {
         if (menu.setParentId(Optional.ofNullable(menu.getParentId()).orElse(0)).getParentId() > 0) {
-            Assert.isTrue(menuRepository.count(Example.of(new Menu().setParentId(menu.getParentId()))) != 0, "上级菜单不存在");
+            Assert.isTrue(menuRepository.count(Example.of(new Menu().setMenuId(menu.getParentId()))) == 1, "上级菜单不存在");
+        }
+        if (MenuType.PAGE.equals(menu.getMenuType())) {
+            Assert.notNull(menu.getPageRoute(), "页面类型的菜单必须填写页面路由");
+        } else {
+            menu.setPageRoute(null);
         }
         return menuRepository.save(menu);
     }
@@ -57,8 +64,17 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void deleteMenu(int menuId) {
         menuRepository.deleteById(menuId);
+        deleteSubMenus(menuRepository.findAll(Example.of(new Menu().setParentId(menuId))));
+    }
+
+    private void deleteSubMenus(List<Menu> menus) {
+        if (menus.isEmpty()) {
+            return;
+        }
+        menus.forEach(menu -> deleteMenu(menu.getMenuId()));
     }
 
     private List<MenuResponse> filter(List<MenuResponse> menuList, Menu condition) {
@@ -104,19 +120,20 @@ public class MenuServiceImpl implements MenuService {
         }
         Map<Integer, List<Menu>> parentMenuList = menuList.stream()
                 .collect(Collectors.groupingBy(Menu::getParentId, TreeMap::new, Collectors.toList()));
-        return tree(new ArrayList<>(), parentMenuList, ROOT_PARENT_ID);
+        return tree(new ArrayList<>(), parentMenuList, ROOT_PARENT_ID, null);
     }
 
-    private List<MenuResponse> tree(List<MenuResponse> result, Map<Integer, List<Menu>> parentMenuList, int rootParentId) {
+    private List<MenuResponse> tree(List<MenuResponse> result, Map<Integer, List<Menu>> parentMenuList, int rootParentId, String parentName) {
         List<Menu> menus = parentMenuList.get(rootParentId);
         if (menus != null) {
             result.addAll(menus.stream()
                     .map(menu -> {
                         MenuResponse menuResponse = new MenuResponse();
                         BeanUtils.copyProperties(menu, menuResponse);
+                        menuResponse.setParentName(parentName);
                         List<MenuResponse> child = new ArrayList<>();
                         menuResponse.setSubMenuList(child);
-                        tree(child, parentMenuList, menu.getMenuId());
+                        tree(child, parentMenuList, menu.getMenuId(), menu.getMenuName());
                         return menuResponse;
                     })
                     .sorted(Comparator.comparingInt(Menu::getSortNumber))

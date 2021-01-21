@@ -10,7 +10,17 @@ import java.util.List;
  * @author 废柴 2020/12/27 20:48
  */
 public class MenuResponse extends Menu {
+    private String parentName;
     private List<MenuResponse> subMenuList;
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public MenuResponse setParentName(String parentName) {
+        this.parentName = parentName;
+        return this;
+    }
 
     public List<MenuResponse> getSubMenuList() {
         return subMenuList;
