@@ -10,4 +10,5 @@ public class ApplicationConstants {
     }
 
     public static final String PROJECT_MANAGER = "project-manager";
+    public static final int ROOT_PARENT_ID = 0;
 }

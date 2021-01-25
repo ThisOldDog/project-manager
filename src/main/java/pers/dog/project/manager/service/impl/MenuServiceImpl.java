@@ -5,8 +5,9 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import pers.dog.project.manager.constant.ApplicationConstants;
 import pers.dog.project.manager.constant.MenuType;
-import pers.dog.project.manager.controller.vo.MenuResponse;
+import pers.dog.project.manager.controller.vo.MenuTreeResponse;
 import pers.dog.project.manager.entity.Menu;
 import pers.dog.project.manager.repository.MenuRepository;
 import pers.dog.project.manager.service.MenuService;
@@ -22,8 +23,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MenuServiceImpl implements MenuService {
-    private static final int ROOT_PARENT_ID = 0;
-
     private final MenuRepository menuRepository;
 
     public MenuServiceImpl(MenuRepository menuRepository) {
@@ -31,12 +30,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<MenuResponse> treeMenu(Menu menu) {
+    public List<MenuTreeResponse> treeMenu(Menu menu) {
         return filter(tree(menuRepository.findAll()), menu);
     }
 
     @Override
-    public List<MenuResponse> treeMenu(int userId) {
+    public List<MenuTreeResponse> treeMenu(int userId) {
         return tree(menuRepository.findByUser(userId));
     }
 
@@ -77,7 +76,7 @@ public class MenuServiceImpl implements MenuService {
         menus.forEach(menu -> deleteMenu(menu.getMenuId()));
     }
 
-    private List<MenuResponse> filter(List<MenuResponse> menuList, Menu condition) {
+    private List<MenuTreeResponse> filter(List<MenuTreeResponse> menuList, Menu condition) {
         if (condition == null || (
                 !StringUtils.hasText(condition.getMenuCode())
                         && !StringUtils.hasText(condition.getMenuName())
@@ -88,9 +87,9 @@ public class MenuServiceImpl implements MenuService {
         return menuList;
     }
 
-    private boolean isMatchAndRemoveUnmatched(List<MenuResponse> menuList, Menu condition) {
-        List<MenuResponse> matched = new ArrayList<>();
-        List<MenuResponse> unmatched = new ArrayList<>();
+    private boolean isMatchAndRemoveUnmatched(List<MenuTreeResponse> menuList, Menu condition) {
+        List<MenuTreeResponse> matched = new ArrayList<>();
+        List<MenuTreeResponse> unmatched = new ArrayList<>();
         menuList.forEach(menuResponse -> {
             // match
             if (like(menuResponse.getMenuCode(), condition.getMenuCode())
@@ -114,27 +113,27 @@ public class MenuServiceImpl implements MenuService {
         return value != null && pattern != null && value.contains(pattern);
     }
 
-    private List<MenuResponse> tree(List<Menu> menuList) {
+    private List<MenuTreeResponse> tree(List<Menu> menuList) {
         if (menuList.isEmpty()) {
             return Collections.emptyList();
         }
         Map<Integer, List<Menu>> parentMenuList = menuList.stream()
                 .collect(Collectors.groupingBy(Menu::getParentId, TreeMap::new, Collectors.toList()));
-        return tree(new ArrayList<>(), parentMenuList, ROOT_PARENT_ID, null);
+        return tree(new ArrayList<>(), parentMenuList, ApplicationConstants.ROOT_PARENT_ID, null);
     }
 
-    private List<MenuResponse> tree(List<MenuResponse> result, Map<Integer, List<Menu>> parentMenuList, int rootParentId, String parentName) {
+    private List<MenuTreeResponse> tree(List<MenuTreeResponse> result, Map<Integer, List<Menu>> parentMenuList, int rootParentId, String parentName) {
         List<Menu> menus = parentMenuList.get(rootParentId);
         if (menus != null) {
             result.addAll(menus.stream()
                     .map(menu -> {
-                        MenuResponse menuResponse = new MenuResponse();
-                        BeanUtils.copyProperties(menu, menuResponse);
-                        menuResponse.setParentName(parentName);
-                        List<MenuResponse> child = new ArrayList<>();
-                        menuResponse.setSubMenuList(child);
+                        MenuTreeResponse menuTreeResponse = new MenuTreeResponse();
+                        BeanUtils.copyProperties(menu, menuTreeResponse);
+                        menuTreeResponse.setParentName(parentName);
+                        List<MenuTreeResponse> child = new ArrayList<>();
+                        menuTreeResponse.setSubMenuList(child);
                         tree(child, parentMenuList, menu.getMenuId(), menu.getMenuName());
-                        return menuResponse;
+                        return menuTreeResponse;
                     })
                     .sorted(Comparator.comparingInt(Menu::getSortNumber))
                     .collect(Collectors.toList()));

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pers.dog.project.manager.component.context.SecurityContext;
-import pers.dog.project.manager.controller.vo.MenuResponse;
+import pers.dog.project.manager.controller.vo.MenuTreeResponse;
 import pers.dog.project.manager.service.MenuService;
 import pers.dog.project.manager.service.UserService;
 
@@ -39,7 +39,7 @@ public class AccountController {
     }
 
     @GetMapping("/menu/tree")
-    public List<MenuResponse> treeMenu() {
+    public List<MenuTreeResponse> treeMenu() {
         return menuService.treeMenu(securityContext.currentUser().getId());
     }
 }

@@ -34,7 +34,7 @@ public class Menu {
     @Enumerated(EnumType.STRING)
     private MenuType menuType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Integer parentId;
 
     @Column(length = 128)

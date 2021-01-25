@@ -2,12 +2,11 @@ package pers.dog.project.manager.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pers.dog.project.manager.controller.vo.MenuResponse;
+import pers.dog.project.manager.controller.vo.MenuTreeResponse;
 import pers.dog.project.manager.entity.Menu;
 import pers.dog.project.manager.service.MenuService;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 菜单管理
@@ -24,7 +23,7 @@ public class MenuController {
     }
 
     @GetMapping("/tree")
-    public List<MenuResponse> treeMenu(Menu menu) {
+    public List<MenuTreeResponse> treeMenu(Menu menu) {
         return menuService.treeMenu(menu);
     }
 
