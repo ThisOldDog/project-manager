@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="pers.dog.project.manager.mapper.RoleUserMapper">
+
+    <select id="listRoleUser" resultType="pers.dog.project.manager.entity.RoleUser">
+        SELECT PRU.ROLE_USER_ID,
+               PRU.ROLE_ID,
+               PRU.USER_ID,
+               PU.USER_ID AS 'user.user_id',
+               PU.USERNAME AS 'user.username',
+               PU.IS_ADMIN AS 'user.admin',
+               PU.NICKNAME AS 'user.nickname',
+               PU.EMAIL AS 'user.email',
+               PU.AVATAR_URL AS 'user.avatar_url'
+        FROM PM_ROLE_USER PRU
+        JOIN PM_USER PU ON PU.USER_ID = PRU.USER_ID
+        WHERE PRU.ROLE_ID = #{roleId}
+        <if test="user.username != null and user.username != ''">
+            <bind name="usernameLike" value="'%' + user.username + '%'"/>
+            AND PU.USERNAME LIKE #{usernameLike}
+        </if>
+        <if test="user.email != null and user.email != ''">
+            <bind name="emailLike" value="'%' + user.email + '%'"/>
+            AND PU.EMAIL LIKE #{emailLike}
+        </if>
+    </select>
+</mapper>

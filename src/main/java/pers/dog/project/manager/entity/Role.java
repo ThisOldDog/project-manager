@@ -1,26 +1,26 @@
 package pers.dog.project.manager.entity;
 
-import javax.persistence.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+import javax.persistence.Column;
 
 /**
  * 角色实体
  *
  * @author 废柴 2020/12/28 14:25
  */
-@Entity
-@Table(name = "PM_ROLE")
+@TableName("PM_ROLE")
 public class Role {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @TableId(type = IdType.AUTO)
     private Integer roleId;
-    @Column(length = 32, nullable = false, updatable = false, unique = true)
     private String roleCode;
-    @Column(length = 32, nullable = false)
     private String roleName;
-    @Column(nullable = false, updatable = false)
     private Integer parentId;
-    @Column(name = "is_administrator", nullable = false, updatable = false)
-    private Boolean administrator;
+    @TableField(value = "IS_ADMIN")
+    private Boolean admin;
 
     public Integer getRoleId() {
         return roleId;
@@ -58,12 +58,12 @@ public class Role {
         return this;
     }
 
-    public Boolean getAdministrator() {
-        return administrator;
+    public Boolean getAdmin() {
+        return admin;
     }
 
-    public Role setAdministrator(Boolean administrator) {
-        this.administrator = administrator;
+    public Role setAdmin(Boolean admin) {
+        this.admin = admin;
         return this;
     }
 }

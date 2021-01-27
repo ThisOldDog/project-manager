@@ -1,7 +1,7 @@
 package pers.dog.project.manager.controller;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pers.dog.project.manager.entity.User;
@@ -22,9 +22,9 @@ public class UserController {
     }
 
     @GetMapping
-    public Page<User> pageUser(User user,
-                               Pageable pageable) {
-        return userService.pageUser(user, pageable);
+    public IPage<User> pageUser(User user,
+                                Page<User> page) {
+        return userService.pageUser(user, page);
     }
 
     @PutMapping("/cancel-admin/{userId}")

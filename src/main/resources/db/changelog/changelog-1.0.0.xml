@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+    <changeSet id="create-table-user" author="project-manager">
+        <createTable tableName="PM_USER">
+            <column name="USER_ID" type="INTEGER" remarks="用户ID，主键">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="USERNAME" type="VARCHAR(128)" remarks="用户名称">
+                <constraints nullable="false"/>
+            </column>
+            <column name="IS_ADMIN" type="TINYINT(1)" defaultValue="0" remarks="是否管理员">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NICKNAME" type="VARCHAR(128)" remarks="昵称">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EMAIL" type="VARCHAR(256)" remarks="邮箱"/>
+            <column name="AVATAR_URL" type="VARCHAR(1024)" remarks="头像"/>
+        </createTable>
+        <addUniqueConstraint tableName="PM_USER" columnNames="USERNAME" constraintName="PM_USER_U1"/>
+    </changeSet>
+
+    <changeSet id="create-table-menu" author="project-manager">
+        <createTable tableName="PM_MENU">
+            <column name="MENU_ID" type="INTEGER" autoIncrement="true" remarks="菜单ID，主键">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="MENU_CODE" type="VARCHAR(32)" remarks="菜单编码">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MENU_NAME" type="VARCHAR(32)" remarks="菜单名称">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MENU_ICON" type="VARCHAR(128)" remarks="菜单图标"/>
+            <column name="SORT_NUMBER" type="INT" remarks="排序号">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MENU_TYPE" type="VARCHAR(32)" remarks="菜单类型">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PARENT_ID" type="INTEGER" defaultValue="0" remarks="上级菜单ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PAGE_ROUTE" type="VARCHAR(128)" remarks="菜单路由"/>
+        </createTable>
+        <addUniqueConstraint tableName="PM_MENU" columnNames="MENU_CODE" constraintName="PM_MENU_U1"/>
+    </changeSet>
+
+    <changeSet id="create-table-role" author="project-manager">
+        <createTable tableName="PM_ROLE">
+            <column name="ROLE_ID" type="INTEGER" autoIncrement="true" remarks="角色ID，主键">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="ROLE_CODE" type="VARCHAR(32)" remarks="角色编码">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ROLE_NAME" type="VARCHAR(32)" remarks="角色名称">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PARENT_ID" type="INTEGER" defaultValue="0" remarks="上级角色ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="IS_ADMIN" type="TINYINT(1)" defaultValue="0" remarks="是否管理员">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="PM_ROLE" columnNames="ROLE_CODE" constraintName="PM_ROLE_U1"/>
+    </changeSet>
+
+    <changeSet id="create-table-role_user" author="project-manager">
+        <createTable tableName="PM_ROLE_USER">
+            <column name="ROLE_USER_ID" type="INTEGER" autoIncrement="true" remarks="角色用户关联ID，主键">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="ROLE_ID" type="INTEGER" remarks="角色ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="USER_ID" type="INTEGER" remarks="用户ID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="PM_ROLE_USER" columnNames="ROLE_ID, USER_ID" constraintName="PM_ROLE_USER_U1"/>
+    </changeSet>
+
+    <changeSet id="data-init-1.0.0" author="project-manager">
+        <sqlFile path="/db/changelog/data-init-1.0.0.sql"/>
+    </changeSet>
+</databaseChangeLog>

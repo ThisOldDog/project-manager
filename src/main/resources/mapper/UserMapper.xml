@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="pers.dog.project.manager.mapper.MenuMapper">
+
+    <select id="listAssessableMenu" resultType="pers.dog.project.manager.entity.Menu">
+        SELECT PM.MENU_ID,
+               PM.MENU_CODE,
+               PM.MENU_NAME,
+               PM.EMAIL,
+               PM.SORT_NUMBER,
+               PM.MENU_TYPE,
+               PM.PARENT_ID,
+               PM.PAGE_ROUTE
+        FROM PM_MENU PM
+        WHERE EXISTS(SELECT 1
+                     FROM PM_USER PU
+                     WHERE PU.USER_ID = #{userId}
+                       AND PU.IS_ADMIN = 1)
+           OR EXISTS(SELECT 1
+                     FROM PM_USER PU
+                              JOIN PM_ROLE_USER PRU ON PRU.USER_ID = PU.USER_ID
+                              JOIN PM_ROLE_MENU PRM ON PRM.ROLE_ID = PRU.ROLE_ID
+                     WHERE PU.USER_ID = #{userId}
+                       AND PM.MENU_ID = PRM.MENU_ID)
+        ORDER BY SORT_NUMBER
+    </select>
+</mapper>

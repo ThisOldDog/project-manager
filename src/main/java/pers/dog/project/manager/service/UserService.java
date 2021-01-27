@@ -1,7 +1,7 @@
 package pers.dog.project.manager.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import pers.dog.project.manager.entity.User;
 
 /**
@@ -11,7 +11,7 @@ import pers.dog.project.manager.entity.User;
  */
 public interface UserService {
 
-    Page<User> pageUser(User user, Pageable pageable);
+    IPage<User> pageUser(User user, Page<User> pageable);
 
     void storeUser(int userId, String username, String nickname, String email, String avatarUrl);
 

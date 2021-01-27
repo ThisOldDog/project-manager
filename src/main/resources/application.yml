@@ -2,14 +2,13 @@ spring:
   application:
     name: project-manager
   datasource:
-    url: jdbc:h2:file:./src/main/resources/cache/db
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
+    url: jdbc:mysql://127.0.0.1:3306/project_manager?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  liquibase:
+    change-log: classpath:/db/changelog/changelog-master.xml
 logging:
   level:
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
     pers.dog.project.manager: debug
 project-manager:
   gitlab:

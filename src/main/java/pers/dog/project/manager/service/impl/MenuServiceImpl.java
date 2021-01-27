@@ -1,18 +1,18 @@
 package pers.dog.project.manager.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import pers.dog.project.manager.constant.ApplicationConstants;
 import pers.dog.project.manager.constant.MenuType;
 import pers.dog.project.manager.controller.vo.MenuTreeResponse;
 import pers.dog.project.manager.entity.Menu;
-import pers.dog.project.manager.repository.MenuRepository;
+import pers.dog.project.manager.mapper.MenuMapper;
 import pers.dog.project.manager.service.MenuService;
 
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,50 +23,54 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MenuServiceImpl implements MenuService {
-    private final MenuRepository menuRepository;
+    private final MenuMapper menuMapper;
 
-    public MenuServiceImpl(MenuRepository menuRepository) {
-        this.menuRepository = menuRepository;
+    public MenuServiceImpl(MenuMapper menuMapper) {
+        this.menuMapper = menuMapper;
     }
 
     @Override
     public List<MenuTreeResponse> treeMenu(Menu menu) {
-        return filter(tree(menuRepository.findAll()), menu);
+        return filter(tree(menuMapper.selectList(null)), menu);
     }
 
     @Override
     public List<MenuTreeResponse> treeMenu(int userId) {
-        return tree(menuRepository.findByUser(userId));
+        return tree(menuMapper.listAssessableMenu(userId));
     }
 
     @Override
     public Menu queryMenu(int menuId) {
-        return menuRepository.findById(menuId).orElseThrow(() -> new IllegalArgumentException("查询的菜单不存在"));
+        return Optional.ofNullable(menuMapper.selectById(menuId)).orElseThrow(() -> new IllegalArgumentException("查询的菜单不存在"));
     }
 
     @Override
     public Menu createMenu(Menu menu) {
         if (menu.setParentId(Optional.ofNullable(menu.getParentId()).orElse(0)).getParentId() > 0) {
-            Assert.isTrue(menuRepository.count(Example.of(new Menu().setMenuId(menu.getParentId()))) == 1, "上级菜单不存在");
+            Assert.isTrue(menuMapper.selectCount(new QueryWrapper<>(new Menu()).eq("MENU_ID", menu.getParentId())) == 1, "上级菜单不存在");
         }
         if (MenuType.PAGE.equals(menu.getMenuType())) {
             Assert.notNull(menu.getPageRoute(), "页面类型的菜单必须填写页面路由");
         } else {
             menu.setPageRoute(null);
         }
-        return menuRepository.save(menu);
+        menuMapper.insert(menu);
+        return menu;
     }
 
     @Override
     public Menu updateMenu(Menu menu) {
-        return menuRepository.save(menu);
+        menuMapper.updateById(menu);
+        return menu;
     }
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void deleteMenu(int menuId) {
-        menuRepository.deleteById(menuId);
-        deleteSubMenus(menuRepository.findAll(Example.of(new Menu().setParentId(menuId))));
+        menuMapper.deleteById(menuId);
+        deleteSubMenus(menuMapper.selectList(
+                new QueryWrapper<>(new Menu())
+                        .eq("PARENT_ID", menuId)));
     }
 
     private void deleteSubMenus(List<Menu> menus) {

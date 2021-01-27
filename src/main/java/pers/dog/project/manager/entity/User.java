@@ -1,26 +1,23 @@
 package pers.dog.project.manager.entity;
 
-import javax.persistence.*;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * 用户
  *
  * @author 废柴 2020/12/27 20:52
  */
-@Entity
-@Table(name = "PM_USER")
+@TableName("PM_USER")
 public class User {
-    @Id
+    @TableId
     private Integer userId;
-    @Column(length = 128, nullable = false)
     private String username;
-    @Column(name = "is_admin", nullable = false)
+    @TableField(value = "IS_ADMIN")
     private Boolean admin;
-    @Column(length = 128, nullable = false)
     private String nickname;
-    @Column(length = 256)
     private String email;
-    @Column(length = 1024)
     private String avatarUrl;
 
     public Integer getUserId() {

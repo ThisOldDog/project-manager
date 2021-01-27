@@ -1,13 +1,14 @@
 package pers.dog.project.manager.service.impl;
 
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import liquibase.util.BooleanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import pers.dog.project.manager.configuration.IamProperties;
 import pers.dog.project.manager.entity.User;
-import pers.dog.project.manager.repository.UserRepository;
+import pers.dog.project.manager.mapper.UserMapper;
 import pers.dog.project.manager.service.UserService;
 
 import java.util.Objects;
@@ -19,45 +20,52 @@ import java.util.Objects;
  */
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final IamProperties iamProperties;
 
-    public UserServiceImpl(UserRepository userRepository, IamProperties iamProperties) {
-        this.userRepository = userRepository;
+    public UserServiceImpl(UserMapper userMapper, IamProperties iamProperties) {
+        this.userMapper = userMapper;
         this.iamProperties = iamProperties;
     }
 
     @Override
-    public Page<User> pageUser(User user, Pageable pageable) {
-        return userRepository.findAll(
-                Example.of(user,
-                        ExampleMatcher.matching()
-                                .withMatcher("username", ExampleMatcher.GenericPropertyMatchers.contains())
-                                .withMatcher("email", ExampleMatcher.GenericPropertyMatchers.contains())),
-                pageable);
+    public IPage<User> pageUser(User user, Page<User> page) {
+        return userMapper.selectPage(page,
+                new QueryWrapper<>(new User())
+                        .like(StringUtils.hasText(user.getUsername()), "USERNAME", user.getUsername())
+                        .like(StringUtils.hasText(user.getEmail()), "EMAIL", user.getEmail())
+                        .eq(BooleanUtils.isTrue(user.getAdmin()), "IS_ADMIN", true));
     }
 
     @Override
     public void storeUser(int userId, String username, String nickname, String email, String avatarUrl) {
-        userRepository.save(new User()
-                .setUserId(userId)
-                .setUsername(username)
-                .setNickname(nickname)
-                .setAdmin(Objects.equals(iamProperties.getAdminUsername(), username))
-                .setEmail(email)
-                .setAvatarUrl(avatarUrl));
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            userMapper.insert(new User()
+                    .setUserId(userId)
+                    .setUsername(username)
+                    .setNickname(nickname)
+                    .setAdmin(Objects.equals(iamProperties.getAdminUsername(), username))
+                    .setEmail(email)
+                    .setAvatarUrl(avatarUrl));
+        } else {
+            userMapper.updateById(new User()
+                    .setUserId(userId)
+                    .setUsername(username)
+                    .setNickname(nickname)
+                    .setAdmin(Objects.equals(iamProperties.getAdminUsername(), username))
+                    .setEmail(email)
+                    .setAvatarUrl(avatarUrl));
+        }
     }
 
     @Override
     public void adminUser(int userId, boolean isAdmin) {
-        userRepository.save(
-                userRepository.findById(userId)
-                        .orElseThrow(() -> new IllegalArgumentException("User not exists."))
-                        .setAdmin(isAdmin));
+        userMapper.updateById(new User().setUserId(userId).setAdmin(isAdmin));
     }
 
     @Override
     public void deleteUser(int userId) {
-        userRepository.deleteById(userId);
+        userMapper.deleteById(userId);
     }
 }

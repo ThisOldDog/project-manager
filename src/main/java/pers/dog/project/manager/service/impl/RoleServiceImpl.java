@@ -1,16 +1,21 @@
 package pers.dog.project.manager.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import pers.dog.project.manager.constant.ApplicationConstants;
 import pers.dog.project.manager.controller.vo.RoleTreeResponse;
 import pers.dog.project.manager.entity.Role;
-import pers.dog.project.manager.repository.RoleRepository;
+import pers.dog.project.manager.entity.RoleUser;
+import pers.dog.project.manager.entity.User;
+import pers.dog.project.manager.mapper.RoleMapper;
+import pers.dog.project.manager.mapper.RoleUserMapper;
 import pers.dog.project.manager.service.RoleService;
 
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,43 +26,62 @@ import java.util.stream.Collectors;
  */
 @Service
 public class RoleServiceImpl implements RoleService {
-    private final RoleRepository roleRepository;
+    private final RoleMapper roleMapper;
+    private final RoleUserMapper roleUserMapper;
 
-    public RoleServiceImpl(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
+    public RoleServiceImpl(RoleMapper roleMapper,
+                           RoleUserMapper roleUserMapper) {
+        this.roleMapper = roleMapper;
+        this.roleUserMapper = roleUserMapper;
     }
 
     @Override
     public List<RoleTreeResponse> treeRole(Role role) {
-        return tree(roleRepository.findAll());
+        return tree(roleMapper.selectList(null));
     }
 
     @Override
     public Role queryRole(int roleId) {
-        return roleRepository.findById(roleId)
+        return Optional.ofNullable(roleMapper.selectById(roleId))
                 .orElseThrow(() -> new IllegalArgumentException("查询的角色不存在"));
+    }
+
+    @Override
+    public IPage<RoleUser> pageRoleUser(int roleId, User user, Page<RoleUser> page) {
+        return roleUserMapper.listRoleUser(roleId, user, page);
     }
 
     @Override
     public Role createRole(Role role) {
         if (role.setParentId(Optional.ofNullable(role.getParentId()).orElse(0)).getParentId() > 0) {
-            Assert.isTrue(roleRepository.count(Example.of(new Role().setRoleId(role.getParentId()))) == 1, "上级角色不存在");
+            Assert.isTrue(roleMapper.selectCount(
+                    new QueryWrapper<>(new Role()).eq("ROLE_ID", role.getParentId())) == 1,
+                    "上级角色不存在");
         }
         // 管理员角色仅允许通过种子数据导入
-        role.setAdministrator(false);
-        return roleRepository.save(role);
+        role.setAdmin(false);
+        roleMapper.insert(role);
+        return role;
+    }
+
+    @Override
+    public RoleUser createRoleUser(int roleId, int userId) {
+        RoleUser roleUser = new RoleUser().setRoleId(roleId).setUserId(userId);
+        roleUserMapper.insert(roleUser);
+        return roleUser;
     }
 
     @Override
     public Role updateRole(Role role) {
-        return roleRepository.save(role);
+        roleMapper.updateById(role);
+        return role;
     }
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void deleteRole(int roleId) {
-        roleRepository.deleteById(roleId);
-        deleteSubRoles(roleRepository.findAll(Example.of(new Role().setParentId(roleId))));
+        roleMapper.deleteById(roleId);
+        deleteSubRoles(roleMapper.selectList(new QueryWrapper<>(new Role()).eq("PARENT_ID", roleId)));
     }
 
     private void deleteSubRoles(List<Role> roles) {

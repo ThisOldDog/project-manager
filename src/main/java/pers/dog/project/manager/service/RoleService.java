@@ -1,7 +1,11 @@
 package pers.dog.project.manager.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import pers.dog.project.manager.controller.vo.RoleTreeResponse;
 import pers.dog.project.manager.entity.Role;
+import pers.dog.project.manager.entity.RoleUser;
+import pers.dog.project.manager.entity.User;
 
 import java.util.List;
 
@@ -16,7 +20,11 @@ public interface RoleService {
 
     Role queryRole(int roleId);
 
+    IPage<RoleUser> pageRoleUser(int roleId, User user, Page<RoleUser> page);
+
     Role createRole(Role role);
+
+    RoleUser createRoleUser(int roleId, int userId);
 
     Role updateRole(Role role);
 

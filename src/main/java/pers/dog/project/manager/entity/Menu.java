@@ -1,43 +1,26 @@
 package pers.dog.project.manager.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import pers.dog.project.manager.constant.MenuType;
-
-import javax.persistence.*;
 
 /**
  * 菜单
  *
  * @author 废柴 2020/12/27 20:34
  */
-@Entity
-@Table(name = "PM_MENU")
+@TableName("PM_MENU")
 public class Menu {
-    public static final String FIELD_SORT_NUMBER = "sortNumber";
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @TableId(type = IdType.AUTO)
     private Integer menuId;
-
-    @Column(length = 32, updatable = false, unique = true, nullable = false)
     private String menuCode;
-
-    @Column(length = 32, nullable = false)
     private String menuName;
-
-    @Column(length = 32)
     private String menuIcon;
-
-    @Column(nullable = false)
     private Integer sortNumber;
-
-    @Column(length = 32, updatable = false, nullable = false)
-    @Enumerated(EnumType.STRING)
     private MenuType menuType;
-
-    @Column(nullable = false, updatable = false)
     private Integer parentId;
-
-    @Column(length = 128)
     private String pageRoute;
 
     public Integer getMenuId() {
