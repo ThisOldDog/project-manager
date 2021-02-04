@@ -29,12 +29,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public IPage<User> pageUser(User user, Page<User> page) {
-        return userMapper.selectPage(page,
-                new QueryWrapper<>(new User())
-                        .like(StringUtils.hasText(user.getUsername()), "USERNAME", user.getUsername())
-                        .like(StringUtils.hasText(user.getEmail()), "EMAIL", user.getEmail())
-                        .eq(BooleanUtils.isTrue(user.getAdmin()), "IS_ADMIN", true));
+    public IPage<User> pageUser(User user, Integer withoutRoleId, Page<User> page) {
+        return userMapper.listUser(user, withoutRoleId, page);
     }
 
     @Override

@@ -26,7 +26,13 @@ public interface RoleService {
 
     RoleUser createRoleUser(int roleId, int userId);
 
+    List<RoleUser> createRoleUser(int roleId, List<RoleUser> roleUserList);
+
     Role updateRole(Role role);
 
     void deleteRole(int roleId);
+
+    void deleteRoleUser(int roleUserId);
+
+    void deleteRoleUser(int roleId, int userId);
 }

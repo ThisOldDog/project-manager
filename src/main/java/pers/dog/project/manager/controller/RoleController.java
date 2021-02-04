@@ -54,6 +54,12 @@ public class RoleController {
         return roleService.createRoleUser(roleId, userId);
     }
 
+    @PostMapping("/{roleId}/user")
+    public List<RoleUser> createRoleUser(@PathVariable int roleId,
+                                         @RequestBody List<RoleUser> roleUserList) {
+        return roleService.createRoleUser(roleId, roleUserList);
+    }
+
     @PutMapping("/{roleId}")
     public Role updateRole(@PathVariable int roleId,
                            @RequestBody Role role) {
@@ -63,6 +69,19 @@ public class RoleController {
     @DeleteMapping("/{roleId}")
     public ResponseEntity<Void> deleteRole(@PathVariable int roleId) {
         roleService.deleteRole(roleId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/user/{roleUserId}")
+    public ResponseEntity<Void> deleteRoleUser(@PathVariable int roleUserId) {
+        roleService.deleteRoleUser(roleUserId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{roleId}/user/{userId}")
+    public ResponseEntity<Void> deleteRoleUser(@PathVariable int roleId,
+                                               @PathVariable int userId) {
+        roleService.deleteRoleUser(roleId, userId);
         return ResponseEntity.noContent().build();
     }
 }

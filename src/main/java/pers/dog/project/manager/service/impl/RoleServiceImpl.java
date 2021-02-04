@@ -7,6 +7,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import pers.dog.project.manager.constant.ApplicationConstants;
 import pers.dog.project.manager.controller.vo.RoleTreeResponse;
 import pers.dog.project.manager.entity.Role;
@@ -72,6 +73,26 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<RoleUser> createRoleUser(int roleId, List<RoleUser> roleUserList) {
+        if (CollectionUtils.isEmpty(roleUserList)) {
+            return roleUserList;
+        }
+        Set<Integer> exists = roleUserMapper.selectList(new QueryWrapper<>(new RoleUser())
+                .eq("ROLE_ID", roleId)
+                .in("USER_ID", roleUserList.stream().map(RoleUser::getUserId).collect(Collectors.toList())))
+                .stream()
+                .map(RoleUser::getUserId)
+                .collect(Collectors.toSet());
+        roleUserList.forEach(roleUser -> {
+            if (!exists.contains(roleUser.getUserId())) {
+                roleUserMapper.insert(roleUser.setRoleId(roleId));
+            }
+        });
+        return roleUserList;
+    }
+
+    @Override
     public Role updateRole(Role role) {
         roleMapper.updateById(role);
         return role;
@@ -82,6 +103,16 @@ public class RoleServiceImpl implements RoleService {
     public void deleteRole(int roleId) {
         roleMapper.deleteById(roleId);
         deleteSubRoles(roleMapper.selectList(new QueryWrapper<>(new Role()).eq("PARENT_ID", roleId)));
+    }
+
+    @Override
+    public void deleteRoleUser(int roleUserId) {
+        roleUserMapper.deleteById(roleUserId);
+    }
+
+    @Override
+    public void deleteRoleUser(int roleId, int userId) {
+        roleUserMapper.delete(new QueryWrapper<>(new RoleUser()).eq("ROLE_ID", roleId).eq("USER_ID", userId));
     }
 
     private void deleteSubRoles(List<Role> roles) {

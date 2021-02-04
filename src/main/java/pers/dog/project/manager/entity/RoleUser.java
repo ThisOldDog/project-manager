@@ -1,11 +1,9 @@
 package pers.dog.project.manager.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import javax.persistence.Column;
-import javax.persistence.Transient;
 
 /**
  * 角色用户实体
@@ -19,7 +17,7 @@ public class RoleUser {
     private Integer roleId;
     private Integer userId;
 
-    @Transient
+    @TableField(exist = false)
     private User user;
 
     public Integer getRoleUserId() {

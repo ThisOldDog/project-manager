@@ -1,27 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="pers.dog.project.manager.mapper.MenuMapper">
+<mapper namespace="pers.dog.project.manager.mapper.UserMapper">
 
-    <select id="listAssessableMenu" resultType="pers.dog.project.manager.entity.Menu">
-        SELECT PM.MENU_ID,
-               PM.MENU_CODE,
-               PM.MENU_NAME,
-               PM.EMAIL,
-               PM.SORT_NUMBER,
-               PM.MENU_TYPE,
-               PM.PARENT_ID,
-               PM.PAGE_ROUTE
-        FROM PM_MENU PM
-        WHERE EXISTS(SELECT 1
-                     FROM PM_USER PU
-                     WHERE PU.USER_ID = #{userId}
-                       AND PU.IS_ADMIN = 1)
-           OR EXISTS(SELECT 1
-                     FROM PM_USER PU
-                              JOIN PM_ROLE_USER PRU ON PRU.USER_ID = PU.USER_ID
-                              JOIN PM_ROLE_MENU PRM ON PRM.ROLE_ID = PRU.ROLE_ID
-                     WHERE PU.USER_ID = #{userId}
-                       AND PM.MENU_ID = PRM.MENU_ID)
-        ORDER BY SORT_NUMBER
+    <select id="listUser" resultType="pers.dog.project.manager.entity.User">
+        SELECT PU.USER_ID,
+               PU.USERNAME,
+               PU.IS_ADMIN,
+               PU.NICKNAME,
+               PU.EMAIL,
+               PU.AVATAR_URL
+        FROM PM_USER PU
+        <where>
+            <if test="user.username != null and user.username != ''">
+                <bind name="usernameLike" value="'%' + user.username + '%'"/>
+                AND PU.USERNAME LIKE #{usernameLike}
+            </if>
+            <if test="user.nickname != null and user.nickname != ''">
+                <bind name="nicknameLike" value="'%' + user.nickname + '%'"/>
+                AND PU.NICKNAME LIKE #{nicknameLike}
+            </if>
+            <if test="user.email != null and user.email != ''">
+                <bind name="emailLike" value="'%' + user.email + '%'"/>
+                AND PU.EMAIL LIKE #{emailLike}
+            </if>
+            <if test="user.admin">
+                AND PU.IS_ADMIN = 1
+            </if>
+            <if test="withoutRoleId != null">
+                AND NOT EXISTS (SELECT 1 FROM PM_ROLE_USER PRU WHERE PRU.USER_ID = PU.USER_ID AND PRU.ROLE_ID = #{withoutRoleId})
+            </if>
+        </where>
     </select>
 </mapper>
