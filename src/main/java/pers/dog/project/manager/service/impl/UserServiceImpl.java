@@ -1,11 +1,8 @@
 package pers.dog.project.manager.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import liquibase.util.BooleanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import pers.dog.project.manager.configuration.IamProperties;
 import pers.dog.project.manager.entity.User;
 import pers.dog.project.manager.mapper.UserMapper;
@@ -29,8 +26,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public IPage<User> pageUser(User user, Integer withoutRoleId, Page<User> page) {
-        return userMapper.listUser(user, withoutRoleId, page);
+    public IPage<User> pageUser(User user, Integer withoutRoleId, Boolean withoutAdmin, Page<User> page) {
+        return userMapper.listUser(user, withoutRoleId, withoutAdmin, page);
     }
 
     @Override

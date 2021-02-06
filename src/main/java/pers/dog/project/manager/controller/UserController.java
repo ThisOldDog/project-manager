@@ -24,8 +24,9 @@ public class UserController {
     @GetMapping
     public IPage<User> pageUser(User user,
                                 @RequestParam(required = false) Integer withoutRoleId,
+                                @RequestParam(required = false) Boolean withoutAdmin,
                                 Page<User> page) {
-        return userService.pageUser(user, withoutRoleId, page);
+        return userService.pageUser(user, withoutRoleId, withoutAdmin, page);
     }
 
     @PutMapping("/cancel-admin/{userId}")

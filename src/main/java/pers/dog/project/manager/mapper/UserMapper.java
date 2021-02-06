@@ -17,5 +17,6 @@ public interface UserMapper extends BaseMapper<User> {
 
     IPage<User> listUser(@Param("user") User user,
                          @Param("withoutRoleId") Integer withoutRoleId,
+                         @Param("withoutAdmin") Boolean withoutAdmin,
                          @Param("page") Page<User> page);
 }

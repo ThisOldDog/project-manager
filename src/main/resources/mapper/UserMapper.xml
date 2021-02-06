@@ -5,7 +5,7 @@
     <select id="listUser" resultType="pers.dog.project.manager.entity.User">
         SELECT PU.USER_ID,
                PU.USERNAME,
-               PU.IS_ADMIN,
+               PU.IS_ADMIN AS 'ADMIN',
                PU.NICKNAME,
                PU.EMAIL,
                PU.AVATAR_URL
@@ -28,6 +28,9 @@
             </if>
             <if test="withoutRoleId != null">
                 AND NOT EXISTS (SELECT 1 FROM PM_ROLE_USER PRU WHERE PRU.USER_ID = PU.USER_ID AND PRU.ROLE_ID = #{withoutRoleId})
+            </if>
+            <if test="withoutAdmin">
+                AND PU.IS_ADMIN &lt;&gt; 1
             </if>
         </where>
     </select>

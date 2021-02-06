@@ -11,7 +11,7 @@ import pers.dog.project.manager.entity.User;
  */
 public interface UserService {
 
-    IPage<User> pageUser(User user, Integer withoutRoleId, Page<User> pageable);
+    IPage<User> pageUser(User user, Integer withoutRoleId, Boolean withoutAdmin, Page<User> pageable);
 
     void storeUser(int userId, String username, String nickname, String email, String avatarUrl);
 
