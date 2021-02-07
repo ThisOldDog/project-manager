@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="pers.dog.project.manager.mapper.RoleMenuMapper">
+
+
+    <select id="listRoleMenu" resultType="pers.dog.project.manager.entity.RoleMenu">
+        SELECT
+            PRM.ROLE_MENU_ID,
+            PRM.ROLE_ID,
+            PRM.MENU_ID,
+            PM.MENU_ID AS 'menu.menu_id',
+            PM.MENU_CODE AS 'menu.menu_code',
+            PM.MENU_NAME AS 'menu.menu_name',
+            PM.MENU_ICON AS 'menu.menu_icon',
+            PM.SORT_NUMBER AS 'menu.sort_number',
+            PM.MENU_TYPE AS 'menu.menu_type',
+            PM.PARENT_ID AS 'menu.parent_id',
+            PM.PAGE_ROUTE AS 'menu.page_route'
+        FROM PM_MENU PM
+        LEFT JOIN PM_ROLE_MENU PRM ON PRM.MENU_ID = PM.MENU_ID AND PRM.ROLE_ID = #{roleId}
+    </select>
+</mapper>

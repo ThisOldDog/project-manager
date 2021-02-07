@@ -85,6 +85,21 @@
         <addUniqueConstraint tableName="PM_ROLE_USER" columnNames="ROLE_ID, USER_ID" constraintName="PM_ROLE_USER_U1"/>
     </changeSet>
 
+    <changeSet id="create-table-role_menu" author="project-manager">
+        <createTable tableName="PM_ROLE_MENU">
+            <column name="ROLE_MENU_ID" type="INTEGER" autoIncrement="true" remarks="角色菜单关联ID，主键">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="ROLE_ID" type="INTEGER" remarks="角色ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MENU_ID" type="INTEGER" remarks="菜单ID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="PM_ROLE_MENU" columnNames="ROLE_ID, MENU_ID" constraintName="PM_ROLE_MENU_U1"/>
+    </changeSet>
+
     <changeSet id="data-init-1.0.0" author="project-manager">
         <sqlFile path="/db/changelog/data-init-1.0.0.sql"/>
     </changeSet>

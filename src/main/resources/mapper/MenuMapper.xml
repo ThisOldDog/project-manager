@@ -6,7 +6,7 @@
         SELECT PM.MENU_ID,
                PM.MENU_CODE,
                PM.MENU_NAME,
-               PM.EMAIL,
+               PM.MENU_ICON,
                PM.SORT_NUMBER,
                PM.MENU_TYPE,
                PM.PARENT_ID,
@@ -16,6 +16,12 @@
                      FROM PM_USER PU
                      WHERE PU.USER_ID = #{userId}
                        AND PU.IS_ADMIN = 1)
+           OR EXISTS(SELECT 1
+                     FROM PM_USER PU
+                              JOIN PM_ROLE_USER PRU ON PRU.USER_ID = PU.USER_ID
+                              JOIN PM_ROLE PR ON PR.ROLE_ID = PRU.ROLE_ID
+                     WHERE PU.USER_ID = #{userId}
+                       AND PR.IS_ADMIN = 1)
            OR EXISTS(SELECT 1
                      FROM PM_USER PU
                               JOIN PM_ROLE_USER PRU ON PRU.USER_ID = PU.USER_ID

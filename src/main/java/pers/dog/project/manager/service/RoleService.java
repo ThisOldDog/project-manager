@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import pers.dog.project.manager.controller.vo.RoleTreeResponse;
 import pers.dog.project.manager.entity.Role;
+import pers.dog.project.manager.entity.RoleMenu;
 import pers.dog.project.manager.entity.RoleUser;
 import pers.dog.project.manager.entity.User;
 
@@ -22,11 +23,15 @@ public interface RoleService {
 
     IPage<RoleUser> pageRoleUser(int roleId, User user, Page<RoleUser> page);
 
+    List<RoleMenu> treeRoleMenu(int roleId);
+
     Role createRole(Role role);
 
     RoleUser createRoleUser(int roleId, int userId);
 
     List<RoleUser> createRoleUser(int roleId, List<RoleUser> roleUserList);
+
+    RoleMenu createRoleMenu(int roleId, int menuId);
 
     Role updateRole(Role role);
 
@@ -35,4 +40,8 @@ public interface RoleService {
     void deleteRoleUser(int roleUserId);
 
     void deleteRoleUser(int roleId, int userId);
+
+    void deleteRoleMenu(int roleId, int menuId);
+
+    void deleteRoleMenu(int roleMenuId);
 }

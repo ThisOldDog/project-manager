@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pers.dog.project.manager.controller.vo.RoleTreeResponse;
 import pers.dog.project.manager.entity.Role;
+import pers.dog.project.manager.entity.RoleMenu;
 import pers.dog.project.manager.entity.RoleUser;
 import pers.dog.project.manager.entity.User;
 import pers.dog.project.manager.service.RoleService;
@@ -37,10 +38,15 @@ public class RoleController {
     }
 
     @GetMapping("/{roleId}/user")
-    public IPage<RoleUser> queryRoleUser(@PathVariable int roleId,
-                                         User user,
-                                         Page<RoleUser> page) {
+    public IPage<RoleUser> pageRoleUser(@PathVariable int roleId,
+                                        User user,
+                                        Page<RoleUser> page) {
         return roleService.pageRoleUser(roleId, user, page);
+    }
+
+    @GetMapping("/{roleId}/menu/tree")
+    public List<RoleMenu> treeRoleMenu(@PathVariable int roleId) {
+        return roleService.treeRoleMenu(roleId);
     }
 
     @PostMapping
@@ -58,6 +64,12 @@ public class RoleController {
     public List<RoleUser> createRoleUser(@PathVariable int roleId,
                                          @RequestBody List<RoleUser> roleUserList) {
         return roleService.createRoleUser(roleId, roleUserList);
+    }
+
+    @PostMapping("/{roleId}/menu/{menuId}")
+    public RoleMenu createRoleMenu(@PathVariable int roleId,
+                                   @PathVariable int menuId) {
+        return roleService.createRoleMenu(roleId, menuId);
     }
 
     @PutMapping("/{roleId}")
@@ -82,6 +94,19 @@ public class RoleController {
     public ResponseEntity<Void> deleteRoleUser(@PathVariable int roleId,
                                                @PathVariable int userId) {
         roleService.deleteRoleUser(roleId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/menu/{roleMenuId}")
+    public ResponseEntity<Void> deleteRoleMenu(@PathVariable int roleMenuId) {
+        roleService.deleteRoleMenu(roleMenuId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{roleId}/menu/{menuId}")
+    public ResponseEntity<Void> deleteRoleMenu(@PathVariable int roleId,
+                                               @PathVariable int menuId) {
+        roleService.deleteRoleMenu(roleId, menuId);
         return ResponseEntity.noContent().build();
     }
 }

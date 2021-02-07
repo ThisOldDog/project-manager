@@ -11,11 +11,14 @@ import org.springframework.util.CollectionUtils;
 import pers.dog.project.manager.constant.ApplicationConstants;
 import pers.dog.project.manager.controller.vo.RoleTreeResponse;
 import pers.dog.project.manager.entity.Role;
+import pers.dog.project.manager.entity.RoleMenu;
 import pers.dog.project.manager.entity.RoleUser;
 import pers.dog.project.manager.entity.User;
 import pers.dog.project.manager.mapper.RoleMapper;
+import pers.dog.project.manager.mapper.RoleMenuMapper;
 import pers.dog.project.manager.mapper.RoleUserMapper;
 import pers.dog.project.manager.service.RoleService;
+import pers.dog.project.manager.util.tree.TreeUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,11 +32,14 @@ import java.util.stream.Collectors;
 public class RoleServiceImpl implements RoleService {
     private final RoleMapper roleMapper;
     private final RoleUserMapper roleUserMapper;
+    private final RoleMenuMapper roleMenuMapper;
 
     public RoleServiceImpl(RoleMapper roleMapper,
-                           RoleUserMapper roleUserMapper) {
+                           RoleUserMapper roleUserMapper,
+                           RoleMenuMapper roleMenuMapper) {
         this.roleMapper = roleMapper;
         this.roleUserMapper = roleUserMapper;
+        this.roleMenuMapper = roleMenuMapper;
     }
 
     @Override
@@ -50,6 +56,14 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public IPage<RoleUser> pageRoleUser(int roleId, User user, Page<RoleUser> page) {
         return roleUserMapper.listRoleUser(roleId, user, page);
+    }
+
+    @Override
+    public List<RoleMenu> treeRoleMenu(int roleId) {
+        return TreeUtils.buildTree(
+                roleMenuMapper.listRoleMenu(roleId),
+                roleMenu -> roleMenu.getMenu().getParentId(),
+                roleMenu -> roleMenu.getMenu().getMenuId());
     }
 
     @Override
@@ -93,6 +107,13 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    public RoleMenu createRoleMenu(int roleId, int menuId) {
+        RoleMenu roleMenu = new RoleMenu().setRoleId(roleId).setMenuId(menuId);
+        roleMenuMapper.insert(roleMenu);
+        return roleMenu;
+    }
+
+    @Override
     public Role updateRole(Role role) {
         roleMapper.updateById(role);
         return role;
@@ -113,6 +134,16 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void deleteRoleUser(int roleId, int userId) {
         roleUserMapper.delete(new QueryWrapper<>(new RoleUser()).eq("ROLE_ID", roleId).eq("USER_ID", userId));
+    }
+
+    @Override
+    public void deleteRoleMenu(int roleId, int menuId) {
+        roleMenuMapper.delete(new QueryWrapper<>(new RoleMenu()).eq("ROLE_ID", roleId).eq("MENU_ID", menuId));
+    }
+
+    @Override
+    public void deleteRoleMenu(int roleMenuId) {
+        roleMenuMapper.deleteById(roleMenuId);
     }
 
     private void deleteSubRoles(List<Role> roles) {
